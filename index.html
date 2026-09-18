@@ -1,106 +1,140 @@
 <!doctype html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Walk Score Helper</title>
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap');
 
-		:root { --ink:#152426; --muted:#617071; --paper:#f7f5ed; --panel:#fffdf8; --line:#d5d8cc; --teal:#0b746d; --yellow:#f7c948; --peach:#ff886d; }
-		* { box-sizing:border-box; }
-		body { margin:0; min-height:100vh; background:radial-gradient(circle at 92% 8%, #f9d983 0 9%, transparent 9.2%), linear-gradient(120deg, #eef0df, var(--paper) 48%, #faf3df); color:var(--ink); font-family:Manrope, sans-serif; }
-		.shell { width:min(1200px, calc(100% - 32px)); margin:0 auto; padding:38px 0 56px; }
-		header { display:flex; justify-content:space-between; align-items:flex-start; gap:24px; margin-bottom:32px; }
-		.eyebrow { color:var(--teal); font:500 12px/1 "DM Mono", monospace; letter-spacing:.08em; text-transform:uppercase; }
-		h1 { font:700 clamp(32px, 5vw, 58px)/.98 Fraunces, serif; letter-spacing:0; margin:9px 0 0; }
-		.progress { display:flex; gap:8px; padding-top:8px; }
-		.progress span { width:34px; height:5px; border-radius:2px; background:#c9d0c3; }
-		.progress span.active { background:var(--teal); }
-		main { background:rgba(255,253,248,.88); border:1px solid var(--line); box-shadow:8px 8px 0 rgba(21,36,38,.08); padding:clamp(22px,4vw,48px); }
-		.step { display:none; } .step.active { display:block; animation:enter .35s ease both; }
-		@keyframes enter { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
-		h2 { font:700 clamp(24px,3vw,36px)/1.1 Fraunces,serif; margin:0 0 8px; }
-		.lede { color:var(--muted); margin:0 0 28px; }
-		label { display:block; font-size:12px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; margin-bottom:9px; }
-		textarea, input, select { width:100%; color:var(--ink); font:14px/1.45 "DM Mono",monospace; background:#fffefa; border:1px solid #bfc7bc; border-radius:2px; padding:12px; }
-		textarea:focus, input:focus, select:focus { outline:3px solid #f9db82; border-color:var(--teal); }
-		#addresses { min-height:220px; resize:vertical; }
-		.or { display:flex; align-items:center; gap:12px; color:var(--muted); font-size:12px; margin:22px 0; } .or::before,.or::after { content:""; height:1px; background:var(--line); flex:1; }
-		.upload { padding:20px; border:1px dashed #8b9a91; background:#f3f5e8; }
-		.file-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
-		input[type=file] { max-width:300px; padding:8px; font-family:Manrope,sans-serif; background:transparent; border:none; }
-		.column-row { display:none; align-items:end; gap:12px; margin-top:18px; } .column-row.visible { display:flex; }
-		.column-row select { max-width:360px; }
-		.actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:30px; }
-		button, .link-button { border:0; border-radius:2px; background:var(--teal); color:white; padding:12px 18px; font:700 13px Manrope,sans-serif; cursor:pointer; transition:transform .15s, background .15s; }
-		button:hover { transform:translateY(-2px); background:#075a55; } button.secondary { background:#e5e8dc; color:var(--ink); } button.secondary:hover { background:#d5daca; }
-		.hint { font-size:12px; color:var(--muted); } .error { color:#ae3420; min-height:18px; font-size:13px; margin-top:10px; }
-		.table-wrap { overflow-x:auto; border:1px solid var(--line); }
-		table { width:100%; border-collapse:collapse; min-width:950px; } th { text-align:left; background:#eaf0e5; font-size:11px; letter-spacing:.08em; padding:12px; } td { vertical-align:top; border-top:1px solid var(--line); padding:10px; font-size:13px; }
-		td.address { width:22%; font-weight:600; } td a { color:var(--teal); font-weight:700; text-decoration-thickness:1px; } td input { min-width:85px; padding:8px; } td textarea { min-width:260px; min-height:76px; padding:8px; resize:vertical; }
-		.export-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; } .export { border-top:5px solid var(--teal); background:#f0f3e8; padding:17px; } .export:nth-child(2) { border-color:var(--yellow); } .export:nth-child(3) { border-color:var(--peach); }
-		.export h3 { margin:0 0 12px; font:700 22px Fraunces,serif; } .export textarea { height:250px; margin-bottom:10px; resize:vertical; font-size:12px; } .export-actions { display:flex; gap:8px; } .export-actions button { flex:1; padding:10px 8px; font-size:11px; }
-		@media (max-width:760px) { .shell { width:min(100% - 22px,1200px); padding-top:22px; } header { margin-bottom:22px; } .progress { padding-top:3px; } main { padding:22px 16px; } .export-grid { grid-template-columns:1fr; } .column-row.visible { display:block; } .column-row select { max-width:none; margin-bottom:10px; } }
-	</style>
-	<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walk Score Helper</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
+
 <body>
-	<div class="shell">
-		<header><div><div class="eyebrow">Address collection tool</div><h1>Walk Score Helper</h1></div><div class="progress" aria-label="Wizard progress"><span class="active"></span><span></span><span></span></div></header>
-		<main>
-			<section class="step active" id="step-1">
-				<h2>Bring in your addresses</h2><p class="lede">Enter one street address per line, or import a spreadsheet.</p>
-				<label for="addresses">Street addresses</label><textarea id="addresses" placeholder="1509 Main St, Dallas, TX&#10;200 Congress Ave, Austin, TX"></textarea>
-				<div class="or">or</div>
-				<div class="upload"><label for="file-input">Upload CSV, TSV, or Excel file</label><div class="file-row"><input type="file" id="file-input" accept=".csv,.tsv,.txt,.xlsx,.xls"><span class="hint" id="file-status">No file selected</span></div><div class="column-row" id="column-row"><div><label for="column-select">Street address column</label><select id="column-select"></select></div><button type="button" class="secondary" id="import-column">Import addresses</button></div></div>
-				<div class="error" id="address-error"></div><div class="actions"><span class="hint">You can edit imported addresses before continuing.</span><button type="button" id="to-scores">Next</button></div>
-			</section>
-			<section class="step" id="step-2">
-				<h2>Collect the scores</h2><p class="lede">Open each Walk Score search in one reusable window. Pasting its result text can fill scores automatically.</p>
-				<div class="table-wrap"><table><thead><tr><th>Address</th><th>Link</th><th>Walk Score</th><th>Transit Score</th><th>Bike Score</th><th>Paste Box</th></tr></thead><tbody id="score-rows"></tbody></table></div>
-				<div class="actions"><button type="button" class="secondary" data-back="1">Back</button><button type="button" id="to-export">Next</button></div>
-			</section>
-			<section class="step" id="step-3">
-				<h2>Export your result</h2><p class="lede"><span id="result-count">0</span> addresses ready. Edit an export directly before copying or downloading.</p>
-				<div class="export-grid">
-					<section class="export"><h3>CSV</h3><textarea id="csv-output" aria-label="CSV export"></textarea><div class="export-actions"><button type="button" data-copy="csv-output">Copy</button><button type="button" class="secondary" data-download="csv-output" data-name="walk-scores.csv" data-type="text/csv">Download</button></div></section>
-					<section class="export"><h3>JSON</h3><textarea id="json-output" aria-label="JSON export"></textarea><div class="export-actions"><button type="button" data-copy="json-output">Copy</button><button type="button" class="secondary" data-download="json-output" data-name="walk-scores.json" data-type="application/json">Download</button></div></section>
-					<section class="export"><h3>GeoJSON</h3><textarea id="geojson-output" aria-label="GeoJSON export"></textarea><div class="export-actions"><button type="button" data-copy="geojson-output">Copy</button><button type="button" class="secondary" data-download="geojson-output" data-name="walk-scores.geojson" data-type="application/geo+json">Download</button></div></section>
-				</div><div class="actions"><button type="button" class="secondary" data-back="2">Back</button></div>
-			</section>
-		</main>
-	</div>
-	<script>
-		const state = { rows: [], importedRows: [] };
-		const $ = (selector) => document.querySelector(selector);
-		const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[character]);
-		const slugifyAddress = (address) => address.toLowerCase().trim().replace(/\b(street)\b/g, 'st').replace(/\b(avenue)\b/g, 'ave').replace(/\b(road)\b/g, 'rd').replace(/\b(boulevard)\b/g, 'blvd').replace(/\b(drive)\b/g, 'dr').replace(/\b(lane)\b/g, 'ln').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-		const scoreUrl = (address) => `https://www.walkscore.com/score/${slugifyAddress(address)}`;
-		function goTo(step) { document.querySelectorAll('.step').forEach(section => section.classList.toggle('active', section.id === `step-${step}`)); document.querySelectorAll('.progress span').forEach((segment, index) => segment.classList.toggle('active', index < step)); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-		function parseScores(text) {
-			const patterns = { walk: /(?:walk\s*score|walkability)[^\d]{0,35}(\d{1,3})/i, transit: /(?:transit\s*score|transit)[^\d]{0,35}(\d{1,3})/i, bike: /(?:bike\s*score|biking|bikeability)[^\d]{0,35}(\d{1,3})/i };
-			return Object.fromEntries(Object.entries(patterns).map(([key, pattern]) => [key, Number(text.match(pattern)?.[1]) || '']));
-		}
-		function renderScoreRows() {
-			$('#score-rows').innerHTML = state.rows.map((row, index) => `<tr data-index="${index}"><td class="address">${escapeHtml(row.address)}</td><td><a href="${scoreUrl(row.address)}" target="walkScoreSearch" rel="noopener">Open search</a></td><td><input aria-label="Walk Score for ${escapeHtml(row.address)}" type="number" min="0" max="100" value="${row.walk}"></td><td><input aria-label="Transit Score for ${escapeHtml(row.address)}" type="number" min="0" max="100" value="${row.transit}"></td><td><input aria-label="Bike Score for ${escapeHtml(row.address)}" type="number" min="0" max="100" value="${row.bike}"></td><td><textarea aria-label="Paste score details for ${escapeHtml(row.address)}" placeholder="Paste Walk Score details here">${escapeHtml(row.paste)}</textarea></td></tr>`).join('');
-			document.querySelectorAll('#score-rows tr').forEach(tr => { const inputs = tr.querySelectorAll('input'); const paste = tr.querySelector('textarea'); const update = () => { const row = state.rows[tr.dataset.index]; [row.walk, row.transit, row.bike] = [...inputs].map(input => input.value); }; inputs.forEach(input => input.addEventListener('input', update)); paste.addEventListener('input', () => { const row = state.rows[tr.dataset.index]; row.paste = paste.value; const scores = parseScores(paste.value); inputs[0].value = row.walk = scores.walk; inputs[1].value = row.transit = scores.transit; inputs[2].value = row.bike = scores.bike; }); });
-		}
-		function quoted(value) { const text = String(value ?? ''); return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text; }
-		function exportData() {
-			const records = state.rows.map(row => ({ address: row.address, 'walk score': Number(row.walk) || null, 'bike score': Number(row.bike) || null, 'transit score': Number(row.transit) || null }));
-			$('#result-count').textContent = records.length;
-			$('#json-output').value = JSON.stringify(records, null, 2);
-			$('#csv-output').value = [['address', 'walk score', 'bike score', 'transit score'], ...records.map(row => [row.address, row['walk score'], row['bike score'], row['transit score']])].map(row => row.map(quoted).join(',')).join('\n');
-			$('#geojson-output').value = JSON.stringify({ type: 'FeatureCollection', features: records.map(properties => ({ type: 'Feature', properties, geometry: null })) }, null, 2);
-		}
-		$('#file-input').addEventListener('change', async event => { const file = event.target.files[0]; if (!file) return; $('#file-status').textContent = file.name; let rows; try { if (/\.xlsx?$/i.test(file.name)) { const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' }); rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '' }); } else { rows = (await file.text()).split(/\r?\n/).filter(Boolean).map(line => line.split(file.name.endsWith('.tsv') ? '\t' : ',')); } const headers = rows.shift().map(String); state.importedRows = rows; $('#column-select').innerHTML = headers.map((header, index) => `<option value="${index}">${escapeHtml(header || `Column ${index + 1}`)}</option>`).join(''); $('#column-row').classList.add('visible'); } catch { $('#file-status').textContent = 'Unable to read this file.'; } });
-		$('#import-column').addEventListener('click', () => { const column = Number($('#column-select').value); const addresses = state.importedRows.map(row => String(row[column] ?? '').trim()).filter(Boolean); $('#addresses').value = addresses.join('\n'); $('#file-status').textContent = `${addresses.length} addresses imported`; });
-		$('#to-scores').addEventListener('click', () => { const addresses = $('#addresses').value.split(/\r?\n/).map(value => value.trim()).filter(Boolean); if (!addresses.length) { $('#address-error').textContent = 'Enter or import at least one address.'; return; } $('#address-error').textContent = ''; state.rows = addresses.map(address => ({ address, walk:'', transit:'', bike:'', paste:'' })); renderScoreRows(); goTo(2); });
-		$('#to-export').addEventListener('click', () => { exportData(); goTo(3); });
-		document.querySelectorAll('[data-back]').forEach(button => button.addEventListener('click', () => goTo(button.dataset.back)));
-		document.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', async () => { const output = $(`#${button.dataset.copy}`); await navigator.clipboard.writeText(output.value); const original = button.textContent; button.textContent = 'Copied'; setTimeout(() => button.textContent = original, 1200); }));
-		document.querySelectorAll('[data-download]').forEach(button => button.addEventListener('click', () => { const blob = new Blob([$(`#${button.dataset.download}`).value], { type: button.dataset.type }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = button.dataset.name; link.click(); URL.revokeObjectURL(link.href); }));
-	</script>
+    <div class="app-layout">
+        <div class="wizard-pane">
+            <div class="shell">
+                <header>
+                    <div>
+                        <div class="eyebrow">Address collection tool</div>
+                        <h1>Walk Score Helper</h1>
+                    </div>
+                    <div class="progress" aria-label="Wizard progress"><span
+                            class="active"></span><span></span><span></span></div>
+                </header>
+                <main>
+                    <section class="step active" id="step-1">
+                        <h2>Bring in your addresses</h2>
+                        <p class="lede">Enter one street address per line, or import a spreadsheet.</p>
+                        <label for="addresses">Street addresses</label><textarea id="addresses"
+                            placeholder="1600 Main St, Dallas, TX&#10;1500 Marilla St, Dallas, TX"></textarea>
+                        <a href='#' class="hint demo-link">Just want to see this in action? Click to load demo data.</a>
+                        <!-- <div class="or">or</div> -->
+                        <div class="upload"><label for="file-input">Upload CSV, TSV, or Excel file</label>
+                            <div class="file-row"><input type="file" id="file-input"
+                                    accept=".csv,.tsv,.txt,.xlsx,.xls"><span class="hint" id="file-status">No file
+                                    selected</span></div>
+                            <div id="import-steps">
+                                <div class="column-row" id="column-row">
+                                    <div><label for="column-select">Address column</label><select
+                                            id="column-select"></select></div>
+                                    <div><label for="latitude-column-select">Latitude column</label><select
+                                            id="latitude-column-select"></select></div>
+                                    <div><label for="longitude-column-select">Longitude column</label><select
+                                            id="longitude-column-select"></select></div>
+                                </div>
+                                <div class="import-actions"><button type="button" class="secondary"
+                                            id="import-column">Import addresses</button><button type="button"
+                                            class="secondary" id="import-merge" hidden>Import and merge addresses</button>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="error" id="address-error"></div>
+                        <div class="actions">
+                            <button type="button" id="to-scores">Next</button>
+                        </div>
+                    </section>
+                    <section class="step" id="step-2">
+                        <h2>Collect the scores</h2>
+                        <p class="lede">Open each Walk Score search in one reusable window. Pasting its result text can
+                            fill scores automatically.</p>
+                        <!-- <div class="score-toolbar">
+                    <button type="button" class="secondary" id="adjust-grouping-radius">Adjust grouping radius</button>
+                </div> -->
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Address</th>
+                                        <th>Link</th>
+                                        <th>Walk Score</th>
+                                        <th>Transit Score</th>
+                                        <th>Bike Score</th>
+                                        <th>Paste Box</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="score-rows"></tbody>
+                            </table>
+                        </div>
+                        <div class="actions"><button type="button" class="secondary" data-back="1">Back</button><button
+                                type="button" id="to-export">Next</button></div>
+                    </section>
+                    <section class="step" id="step-3">
+                        <h2>Export your result</h2>
+                        <p class="lede"><span id="result-count">0</span> addresses ready. Edit an export directly before
+                            copying or downloading.</p>
+                        <div class="export-grid">
+                            <section class="export">
+                                <h3>CSV</h3><textarea id="csv-output" aria-label="CSV export"></textarea>
+                                <div class="export-actions"><button type="button"
+                                        data-copy="csv-output">Copy</button><button type="button" class="secondary"
+                                        data-download="csv-output" data-name="walk-scores.csv"
+                                        data-type="text/csv">Download</button></div>
+                            </section>
+                            <section class="export">
+                                <h3>JSON</h3><textarea id="json-output" aria-label="JSON export"></textarea>
+                                <div class="export-actions"><button type="button"
+                                        data-copy="json-output">Copy</button><button type="button" class="secondary"
+                                        data-download="json-output" data-name="walk-scores.json"
+                                        data-type="application/json">Download</button></div>
+                            </section>
+                            <section class="export">
+                                <h3>GeoJSON</h3><textarea id="geojson-output" aria-label="GeoJSON export"></textarea>
+                                <div class="export-actions"><button type="button"
+                                        data-copy="geojson-output">Copy</button><button type="button" class="secondary"
+                                        data-download="geojson-output" data-name="walk-scores.geojson"
+                                        data-type="application/geo+json">Download</button></div>
+                            </section>
+                        </div>
+                        <div class="actions"><button type="button" class="secondary" data-back="2">Back</button></div>
+                    </section>
+                </main>
+            </div>
+        </div>
+        <aside class="map-pane">
+            <button class="switch-button" data-toggle-pane="search">Switch to search view</button>
+            <div id="score-map" aria-label="Address group map"></div>
+        </aside>
+        <aside class="iframe-pane">
+            <button class="switch-button" data-toggle-pane="map">Switch to map view</button>
+            <iframe id="search-embed" src="https://www.walkscore.com/score/6994-american-way-dallas-tx-75237"></iframe>
+        </aside>
+    </div>
+    <dialog id="grouping-radius-dialog">
+        <form id="grouping-radius-form">
+            <h2>Adjust grouping radius</h2><label for="grouping-radius-input">Enter grouping distance in
+                feet.</label><input type="number" id="grouping-radius-input" min="1" step="1" value="120" required>
+            <div class="dialog-actions"><button type="button" class="secondary"
+                    id="cancel-grouping-radius">Cancel</button><button type="submit">Save</button></div>
+        </form>
+    </dialog>
+    <div class="loading-overlay" id="loading-overlay" hidden>
+        <div class="loading-dialog" role="status"><strong>Locating addresses</strong><span
+                id="loading-message">Preparing score collection...</span></div>
+    </div>
+    <script type="module" src="app.js"></script>
 </body>
+
 </html>
