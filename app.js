@@ -7,9 +7,7 @@ const state = {
 	paneToggleMode: 'map'
 };
 
-window.inspectState = () => {
-	console.log(state);
-};
+window.inspectState = () => console.log(state);
 
 const storageKey = 'walk-score-helper-state';
 const geocodeCacheKey = 'walk-score-helper-geocoding';
@@ -39,6 +37,7 @@ const selectors = {
 	scoreMap: '#score-map',
 	scoreRows: '#score-rows',
 	demoLink: '.hint.demo-link',
+	loadStationsLink: '.hint.load-stations-link',
 };
 
 const streetTypes = [
@@ -494,7 +493,34 @@ async function loadDemoFile() {
 	}
 }
 
+async function loadStations() {
+	console.log('load stations');
+	const filename = 'dart-stations.json';
+	const file = await fetch(filename);
+	if (!file) throw Error('Stations file not found');
+	const results = await file.json();
+	
+	try {
+		const storedRows = [];
+		const importedAddresses = [];
+		results.forEach(({station, longitude, latitude}) => {
+			state.importedCoordinates[station] = {latitude, longitude};
+			storedRows.push(parseDelimitedText(station));
+			importedAddresses.push(station);
+		});
+
+		state.importedRows = [...state.importedRows, ...storedRows];
+		const existingAddresses = getElement(selectors.addresses).value.split(/\r?\n/).map((address) => address.trim());
+		const uniqueAddresses = getUniqueSortedAddresses([...existingAddresses, ...importedAddresses]);
+		getElement(selectors.addresses).value = uniqueAddresses.join('\n');
+		saveAppState();
+	} catch (e) {
+		getElement(selectors.fileStatus).textContent = 'Unable to read this file.';
+	}
+}
+
 getElement(selectors.demoLink).addEventListener('click', loadDemoFile);
+getElement(selectors.loadStationsLink).addEventListener('click', loadStations);
 
 async function handleFileSelection(event) {
 	const file = event.target.files[0];
@@ -543,7 +569,8 @@ function normalizeAddress(address) {
 }
 
 function hasValidStreetAddress(address) {
-	const streetPart = address.split(',', 1)[0];
+	const streetPart = String(address.split(',', 1)[0]);
+	if (/^.*station$/.test(streetPart.toLowerCase())) return true;
 	return /^\d/.test(streetPart) && /[a-z]/i.test(streetPart) && /\d/.test(streetPart);
 }
 
@@ -655,7 +682,7 @@ async function addMissingCoordinates() {
 		showLoading(`Locating address ${index + 1} of ${rowsWithoutCoordinates.length}...`);
 		const coordinates = await geocodeAddress(row.address, cache);
 		if (coordinates) Object.assign(row, coordinates);
-		if (index < rowsWithoutCoordinates.length - 1) await wait(500);
+		if (index < rowsWithoutCoordinates.length - 1) await wait(250);
 	}
 }
 
@@ -784,7 +811,7 @@ function resetMapZoom() {
 async function advanceToScoreCollection() {
 	const addresses = getUniqueSortedAddresses(getElement(selectors.addresses).value
 		.split(/\r?\n/)
-		.map((address) => normalizeAddress(address.replace('"', '').trim()))
+		//.map((address) => normalizeAddress(address.replace('"', '').trim()))
 		.filter(Boolean));
 
 	if (!addresses.length) {
@@ -880,8 +907,8 @@ function bindEvents() {
 	document.addEventListener('input', saveAppState);
 	document.addEventListener('change', saveAppState);
 	document.addEventListener('click', () => toggleSearchViewToggle);
-	window.addEventListener('pagehide', saveAppState);
-	window.addEventListener('scroll', saveAppState, { passive: true });
+	//window.addEventListener('pagehide', saveAppState);
+	//window.addEventListener('scroll', saveAppState, { passive: true });
 }
 
 bindEvents();
