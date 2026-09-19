@@ -61,6 +61,7 @@ let markerLocations = [];
 
 const mapPane = document.querySelector('.map-pane');
 const searchPane = document.querySelector('.iframe-pane');
+const searchIframe = document.getElementById('search-embed');
 
 document.querySelectorAll('[data-toggle-pane]').forEach((button) => {
 	button.addEventListener('click', (e) => {
@@ -121,6 +122,8 @@ function saveAppState() {
 		paneToggleMode: state.paneToggleMode || 'map'
 	};
 
+	toggleSearchViewToggle();
+
 	try {
 		localStorage.setItem(storageKey, JSON.stringify(snapshot));
 	} catch {
@@ -177,6 +180,7 @@ function restoreSavedState() {
 
 	state.paneToggleMode = snapshot.paneToggleMode || 'map';
 	toggleMapSearch(state.paneToggleMode);
+	toggleSearchViewToggle();
 	if (state.paneToggleMode === 'map') {
 		renderScoreMap();
 	}
@@ -309,8 +313,6 @@ function bindScoreRowEvents(tableRow) {
 		copyScoresToGroup(row);
 		saveAppState();
 	});
-
-	const searchIframe = document.getElementById('search-embed');
 
 	tableRow.querySelector('[data-open-score-search]').addEventListener('click', (event) => {
 		event.preventDefault();
@@ -846,6 +848,15 @@ function downloadExport(button) {
 	URL.revokeObjectURL(link.href);
 }
 
+function toggleSearchViewToggle() {
+	const searchToggleButton = getElement('[data-toggle-pane="search"]');
+	if (searchIframe.src.toLowerCase().includes('walkscore.com')) {
+		searchToggleButton.style.display = 'block';
+	} else {
+		searchToggleButton.style.display = 'none';
+	}
+}
+
 function bindEvents() {
 	getElement(selectors.fileInput).addEventListener('change', handleFileSelection);
 	getElement(selectors.importButton).addEventListener('click', () => importSelectedColumn());
@@ -868,6 +879,7 @@ function bindEvents() {
 
 	document.addEventListener('input', saveAppState);
 	document.addEventListener('change', saveAppState);
+	document.addEventListener('click', () => toggleSearchViewToggle);
 	window.addEventListener('pagehide', saveAppState);
 	window.addEventListener('scroll', saveAppState, { passive: true });
 }
