@@ -4,7 +4,7 @@ const state = {
 	importedHeaders: [],
 	importedCoordinates: {},
 	groupingDistance: 200,
-	paneToggleMode: ''
+	paneToggleMode: 'map'
 };
 
 window.inspectState = () => {
@@ -98,7 +98,7 @@ function saveAppState() {
 		scrollX: window.scrollX,
 		scrollY: window.scrollY,
 		step: getActiveStep(),
-		paneToggleMode: state.paneToggleMode
+		paneToggleMode: state.paneToggleMode || 'map'
 	};
 
 	try {
@@ -155,7 +155,7 @@ function restoreSavedState() {
 	});
 	updateImportActions();
 
-	state.paneToggleMode = snapshot.paneToggleMode || '';
+	state.paneToggleMode = snapshot.paneToggleMode || 'map';
 	toggleMapSearch(state.paneToggleMode);
 	if (state.paneToggleMode === 'map') {
 		renderScoreMap();
@@ -238,7 +238,7 @@ function createScoreRowMarkup(row, index) {
 	const groupStyle = row.groupColor ? ` style="--group-color: ${row.groupColor}"` : '';
 	return `<tr class="${groupClasses}" data-index="${index}"${groupStyle}>
 		<td class="address">${address}</td>
-		<td><a href="${getScoreUrl(row.address)}" data-open-score-search>Open search</a><br><a href="#" data-show-on-map>Show on map</a><br><a href="#" data-copy-previous>Copy prior scores</a></td>
+		<td><a href="${getScoreUrl(row.address)}" data-open-score-search><b>Open search</b></a><br><a href="#" data-copy-previous>Copy prior scores</a><br><a href="#" data-show-on-map>Show on map</a></td>
 		<td><input aria-label="Walk Score for ${address}" type="number" min="0" max="100" value="${row.walk}"></td>
 		<td><input aria-label="Transit Score for ${address}" type="number" min="0" max="100" value="${row.transit}"></td>
 		<td><input aria-label="Bike Score for ${address}" type="number" min="0" max="100" value="${row.bike}"></td>
@@ -780,6 +780,7 @@ async function advanceToScoreCollection() {
 		renderScoreRows();
 		navigateToStep(2);
 		renderScoreMap();
+		toggleMapSearch('map');
 	} finally {
 		hideLoading();
 	}

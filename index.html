@@ -18,7 +18,6 @@
             <div class="shell">
                 <header>
                     <div>
-                        <div class="eyebrow">Address collection tool</div>
                         <h1>Walk Score Helper</h1>
                     </div>
                     <div class="progress" aria-label="Wizard progress"><span
@@ -26,11 +25,10 @@
                 </header>
                 <main>
                     <section class="step active" id="step-1">
-                        <h2>Bring in your addresses</h2>
                         <p class="lede">Enter one street address per line, or import a spreadsheet.</p>
+                        <a href='#' class="hint demo-link" style="float: right;">Just want to see this in action? Click to load demo data.</a>
                         <label for="addresses">Street addresses</label><textarea id="addresses"
                             placeholder="1600 Main St, Dallas, TX&#10;1500 Marilla St, Dallas, TX"></textarea>
-                        <a href='#' class="hint demo-link">Just want to see this in action? Click to load demo data.</a>
                         <!-- <div class="or">or</div> -->
                         <div class="upload"><label for="file-input">Upload CSV, TSV, or Excel file</label>
                             <div class="file-row"><input type="file" id="file-input"
@@ -53,22 +51,19 @@
                         </div>
                         <div class="error" id="address-error"></div>
                         <div class="actions">
-                            <button type="button" id="to-scores">Next</button>
+                            <button type="button" id="to-scores">Next: search for walk scores</button>
                         </div>
                     </section>
                     <section class="step" id="step-2">
-                        <h2>Collect the scores</h2>
-                        <p class="lede">Open each Walk Score search in one reusable window. Pasting its result text can
-                            fill scores automatically.</p>
-                        <!-- <div class="score-toolbar">
-                    <button type="button" class="secondary" id="adjust-grouping-radius">Adjust grouping radius</button>
-                </div> -->
-                        <div class="table-wrap">
+                        <p class="lede">Click <b>Open search</b> to look up walk score for an address. Addresses within 200 feet of each other are grouped together; when you set score for one address all in same group will be updated. Click <b>Show on map</b> to zoom to address on interactive map.
+                            To revise your addresses, click <b>Back</b> to return to the import screen. When you're finished, click <b>Next</b> to choose export options. </p>
+                        <!-- <div class="score-toolbar"><button type="button" class="secondary" id="adjust-grouping-radius">Adjust grouping radius</button></div> -->
+                    <div class="table-wrap">
                             <table>
                                 <thead>
                                     <tr>
                                         <th>Address</th>
-                                        <th>Link</th>
+                                        <th>Links</th>
                                         <th>Walk Score</th>
                                         <th>Transit Score</th>
                                         <th>Bike Score</th>
@@ -78,13 +73,11 @@
                                 <tbody id="score-rows"></tbody>
                             </table>
                         </div>
-                        <div class="actions"><button type="button" class="secondary" data-back="1">Back</button><button
-                                type="button" id="to-export">Next</button></div>
+                        <div class="actions"><button type="button" class="secondary" data-back="1">Back: edit address list</button><button
+                                type="button" id="to-export">Next: choose export options</button></div>
                     </section>
                     <section class="step" id="step-3">
-                        <h2>Export your result</h2>
-                        <p class="lede"><span id="result-count">0</span> addresses ready. Edit an export directly before
-                            copying or downloading.</p>
+                        <p class="lede"><span id="result-count">0</span> addresses ready for copying or download.</p>
                         <div class="export-grid">
                             <section class="export">
                                 <h3>CSV</h3><textarea id="csv-output" aria-label="CSV export"></textarea>
@@ -108,7 +101,7 @@
                                         data-type="application/geo+json">Download</button></div>
                             </section>
                         </div>
-                        <div class="actions"><button type="button" class="secondary" data-back="2">Back</button></div>
+                        <div class="actions"><button type="button" class="secondary" data-back="2">Back: search for walk scores</button></div>
                     </section>
                 </main>
             </div>
