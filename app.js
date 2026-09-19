@@ -57,6 +57,7 @@ const getElement = (selector) => document.querySelector(selector);
 let scoreMap;
 let markerSvgTemplatePromise;
 let groupMarkers = new Map();
+let markerLocations = [];
 
 const mapPane = document.querySelector('.map-pane');
 const searchPane = document.querySelector('.iframe-pane');
@@ -68,6 +69,8 @@ document.querySelectorAll('[data-toggle-pane]').forEach((button) => {
 	});
 });
 
+document.querySelector('[data-reset-zoom]').addEventListener('click', resetMapZoom);
+
 const expandToggles = document.querySelectorAll('[data-expand-pane]');
 expandToggles.forEach((button) => {
 	button.addEventListener('click', (e) => {
@@ -76,10 +79,10 @@ expandToggles.forEach((button) => {
 		expandToggles.forEach((b2) => {
 			if (appLayout.classList.contains('expanded')) {
 				b2.innerHTML = 'Collapse pane';
-				scoreMap.invalidateSize();
 			} else {
 				b2.innerHTML = 'Expand pane';
 			}
+			scoreMap.invalidateSize();
 		});
 	});
 });
@@ -750,7 +753,7 @@ async function renderScoreMap() {
 		attribution: '&copy; OpenStreetMap contributors'
 	}).addTo(scoreMap);
 
-	const markerLocations = [];
+	markerLocations = [];
 	for (const rows of getAddressGroups().values()) {
 		const markerRow = rows.find(hasCoordinates);
 		if (!markerRow) continue;
@@ -766,6 +769,12 @@ async function renderScoreMap() {
 		markerLocations.push([markerRow.latitude, markerRow.longitude]);
 	}
 
+	resetMapZoom();
+}
+
+function resetMapZoom() {
+	scoreMap.invalidateSize();
+	if (!markerLocations || !scoreMap) return;
 	if (markerLocations.length === 1) scoreMap.setView(markerLocations[0], 16);
 	if (markerLocations.length > 1) scoreMap.fitBounds(markerLocations, { padding: [24, 24] });
 }
