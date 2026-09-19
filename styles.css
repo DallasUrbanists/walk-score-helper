@@ -331,6 +331,12 @@ td a {
 	text-decoration-thickness: 1px;
 }
 
+a.disabled {
+    cursor: wait;
+    color: grey;
+    text-decoration: none !important;
+}
+
 td input {
 	width: 64px;
 	min-width: 0;
@@ -544,4 +550,45 @@ button.switch-button {
 
 .map-pane:not(:has(.leaflet-container)) .switch-button {
     display: none;
+}
+
+.iframe-pane::before {
+    content: var(--loadingmsg);
+    box-sizing: border-box;
+    padding: 3em;
+    display: none;
+    font-weight: bold;
+    font-size: 1.5rem;
+    flex-direction: column;
+    justify-content: start;
+    text-align: center;
+    color: white;
+    position: absolute;
+    background: rgba(5, 15, 5, 0.5);
+    z-index: 1;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    backdrop-filter: blur(2px);
+    animation: flash-logic 1s cubic-bezier(0.65, 0.05, 0.36, 1) infinite;
+}
+
+.iframe-pane.loading::before {
+	display: flex;
+	cursor: wait;
+}
+
+.iframe-pane {
+	--loadingmsg: "Please wait, searching " attr(data-search-address) " on WalkScore.com...";
+    position: relative;
+}
+
+@keyframes flash-logic {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }

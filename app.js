@@ -238,7 +238,7 @@ function createScoreRowMarkup(row, index) {
 	const groupStyle = row.groupColor ? ` style="--group-color: ${row.groupColor}"` : '';
 	return `<tr class="${groupClasses}" data-index="${index}"${groupStyle}>
 		<td class="address">${address}</td>
-		<td><a href="${getScoreUrl(row.address)}" data-open-score-search><b>Open search</b></a><br><a href="#" data-copy-previous>Copy prior scores</a><br><a href="#" data-show-on-map>Show on map</a></td>
+		<td><a href="${getScoreUrl(row.address)}" data-open-score-search="${row.address}"><b>Open search</b></a><br><a href="#" data-copy-previous>Copy prior scores</a><br><a href="#" data-show-on-map>Show on map</a></td>
 		<td><input aria-label="Walk Score for ${address}" type="number" min="0" max="100" value="${row.walk}"></td>
 		<td><input aria-label="Transit Score for ${address}" type="number" min="0" max="100" value="${row.transit}"></td>
 		<td><input aria-label="Bike Score for ${address}" type="number" min="0" max="100" value="${row.bike}"></td>
@@ -294,8 +294,21 @@ function bindScoreRowEvents(tableRow) {
 
 	tableRow.querySelector('[data-open-score-search]').addEventListener('click', (event) => {
 		event.preventDefault();
+		const target = event.currentTarget;
+		if (target && target.classList.contains('disabled')) return;
 		toggleMapSearch('search');
-		searchIframe.src = event.currentTarget.href;
+		if (searchIframe.src === target.href) return;
+
+		const searchAddress = target.getAttribute('data-open-score-search');
+		searchIframe.src = target.href;
+		searchPane.classList.add('loading');
+		const searchLinks = document.querySelectorAll('[data-open-score-search]');
+		searchLinks.forEach(link => link.classList.add('disabled'));
+		searchPane.setAttribute("data-search-address", searchAddress)
+		searchIframe.addEventListener('load', () => {
+			searchPane.classList.remove('loading');
+			searchLinks.forEach(link => link.classList.remove('disabled'));
+		});
 	});
 
 	tableRow.querySelector('[data-show-on-map]').addEventListener('click', async (event) => {
@@ -826,8 +839,8 @@ function bindEvents() {
 
 	document.addEventListener('input', saveAppState);
 	document.addEventListener('change', saveAppState);
-	window.addEventListener('pagehide', saveAppState);
-	window.addEventListener('scroll', saveAppState, { passive: true });
+	//window.addEventListener('pagehide', saveAppState);
+	//window.addEventListener('scroll', saveAppState, { passive: true });
 }
 
 bindEvents();
