@@ -68,6 +68,23 @@ document.querySelectorAll('[data-toggle-pane]').forEach((button) => {
 	});
 });
 
+const expandToggles = document.querySelectorAll('[data-expand-pane]');
+expandToggles.forEach((button) => {
+	button.addEventListener('click', (e) => {
+		const appLayout = getElement('.app-layout');
+		appLayout.classList.toggle('expanded');
+		expandToggles.forEach((b2) => {
+			if (appLayout.classList.contains('expanded')) {
+				b2.innerHTML = 'Collapse pane';
+				scoreMap.invalidateSize();
+			} else {
+				b2.innerHTML = 'Expand pane';
+			}
+		});
+	});
+});
+
+
 
 function getActiveStep() {
 	return Number(document.querySelector('.step.active')?.id.replace('step-', '')) || 1;
@@ -633,7 +650,7 @@ async function addMissingCoordinates() {
 		showLoading(`Locating address ${index + 1} of ${rowsWithoutCoordinates.length}...`);
 		const coordinates = await geocodeAddress(row.address, cache);
 		if (coordinates) Object.assign(row, coordinates);
-		if (index < rowsWithoutCoordinates.length - 1) await wait(1100);
+		if (index < rowsWithoutCoordinates.length - 1) await wait(500);
 	}
 }
 
@@ -725,7 +742,10 @@ async function renderScoreMap() {
 	if (scoreMap) scoreMap.remove();
 	groupMarkers = new Map();
 
-	scoreMap = L.map(getElement(selectors.scoreMap));
+	scoreMap = L.map(getElement(selectors.scoreMap), {
+		zoomSnap: 0.25,
+    	zoomDelta: 0.25
+	});
 	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		attribution: '&copy; OpenStreetMap contributors'
 	}).addTo(scoreMap);
@@ -839,8 +859,8 @@ function bindEvents() {
 
 	document.addEventListener('input', saveAppState);
 	document.addEventListener('change', saveAppState);
-	//window.addEventListener('pagehide', saveAppState);
-	//window.addEventListener('scroll', saveAppState, { passive: true });
+	window.addEventListener('pagehide', saveAppState);
+	window.addEventListener('scroll', saveAppState, { passive: true });
 }
 
 bindEvents();

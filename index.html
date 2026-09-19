@@ -107,11 +107,17 @@
             </div>
         </div>
         <aside class="map-pane">
-            <button class="switch-button" data-toggle-pane="search">Switch to search view</button>
+            <div class="pane-buttons">
+                <button class="switch-button" data-toggle-pane="search" style="border-left: solid 1px rgba(255, 255, 255, 0.5);">Switch to search view</button>
+                <button class="switch-button" data-expand-pane="map">Expand pane</button>
+            </div>
             <div id="score-map" aria-label="Address group map"></div>
         </aside>
         <aside class="iframe-pane">
-            <button class="switch-button" data-toggle-pane="map">Switch to map view</button>
+            <div class="pane-buttons">
+                <button class="switch-button" data-toggle-pane="map" style="border-left: solid 1px rgba(255, 255, 255, 0.5);float: right;width: 50%;">Switch to map view</button>
+                <button class="switch-button" data-expand-pane="search view" style="width: 50%;">Expand pane</button>
+            </div>
             <iframe id="search-embed" src=""></iframe>
         </aside>
     </div>
