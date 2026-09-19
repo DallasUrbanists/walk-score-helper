@@ -374,7 +374,7 @@ td textarea {
 
 .loading-overlay {
 	position: fixed;
-	z-index: 10;
+	z-index: 99999999999;
 	inset: 0;
 	display: grid;
 	place-items: center;
