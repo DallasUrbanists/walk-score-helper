@@ -541,3 +541,7 @@ button.switch-button {
 #import-steps {
 	display: none;
 }
+
+.map-pane:not(:has(.leaflet-container)) .switch-button {
+    display: none;
+}
