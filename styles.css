@@ -243,6 +243,7 @@ input[type="file"] {
 
 button,
 .link-button {
+	flex-grow: 1;
 	padding: 12px 18px;
 	color: white;
 	font: 700 13px Manrope, sans-serif;
